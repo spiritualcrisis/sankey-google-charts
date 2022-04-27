@@ -1,11 +1,19 @@
-import { configureStore } from "@reduxjs/toolkit";
-import sankeyReducer from "../features/sankeySlice"
+import { configureStore } from '@reduxjs/toolkit'
+// Or from '@reduxjs/toolkit/query/react'
+import { setupListeners } from '@reduxjs/toolkit/query'
+import { sankeySlice } from '../features/sankeySlice'
+
 export const store = configureStore({
-    reducer:{
-        // add all the slices here 
-        sankey:sankeyReducer,
-    }
+  reducer: {
+    // Add the generated reducer as a specific top-level slice
+    [sankeySlice.reducerPath]: sankeySlice.reducer,
+  },
+  // Adding the api middleware enables caching, invalidation, polling,
+  // and other useful features of `rtk-query`.
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(sankeySlice.middleware),
 })
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDisoacth = typeof store.dispatch
+// optional, but required for refetchOnFocus/refetchOnReconnect behaviors
+// see `setupListeners` docs - takes an optional callback as the 2nd arg for customization
+setupListeners(store.dispatch)

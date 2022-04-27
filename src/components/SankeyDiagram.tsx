@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Chart from "react-google-charts";
 
-const data = [
+import { useFetchSankeyDataQuery } from "../features/sankeySlice";
+
+const sankeyData = [
   ["From", "To", "Transaction Value"],
   ["Salary", "Bills", 5000],
   ["Stocks", "Nothing", 1000],
@@ -10,6 +12,7 @@ const data = [
   ["Bills", "Groceries", 2000],
   ["Stocks", "Home Loan", 10000],
 ];
+
 const colors = [
   "#a6cee3",
   "#b2df8a",
@@ -33,16 +36,40 @@ const options = {
     },
   },
 };
-const SankeyDiagram = () => {
+interface SankeyProps {
+  chartWidth: string;
+  chartHeight: string;
+}
+interface Sankey {}
+
+const SankeyDiagram: React.FC<SankeyProps> = ({ chartHeight, chartWidth }) => {
+  const { isLoading, error, data } = useFetchSankeyDataQuery(undefined, {
+    selectFromResult: ({ data, error, isLoading }) => ({
+      data: data?.map((item: Sankey) => Object.values(item)),
+      error,
+      isLoading,
+    }),
+  });
+  type data = [];
+  const formattedData = [["From", "To", "Transaction Value"], ...(data ?? [])];
+  console.log(formattedData);
   return (
     <div>
-      <Chart
-        chartType="Sankey"
-        width="100%"
-        height="200px"
-        data={data}
-        options={options}
-      />
+      {error ? (
+        <>Oh no, there was an error</>
+      ) : isLoading ? (
+        <>Loading...</>
+      ) : data ? (
+        <>
+          <Chart
+            chartType="Sankey"
+            width={chartWidth}
+            height={chartHeight}
+            data={formattedData}
+            options={options}
+          />
+        </>
+      ) : null}
     </div>
   );
 };

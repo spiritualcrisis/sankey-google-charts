@@ -1,21 +1,25 @@
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { buildQueries } from '@testing-library/react';
 
-interface SankeyState {
-    value:string[]
+interface SankeyData {
+    expenseType:string,
+    incomeType:string,
+    transaction:string
 }
 
-const initialState:SankeyState = {
-    value:[]
+export const sankeySlice = createApi({
+    reducerPath:'sankeySlice',
+    baseQuery:fetchBaseQuery({
+        baseUrl:'/api'
+    }),
+    endpoints:(builder) => {
+        return {
+            fetchSankeyData:builder.query<SankeyData[], number|void>({
+                query(limit =10){
+                    return `/getExpenseData`
+                }
+            })
 }
-export const sankeySlice = createSlice({
-    name:"sankey",
-    initialState,
-    reducers:{
-        //methods to handle sankey data
-        addSankeyData:(state, action:PayloadAction<string>) => {
-            state.value.push(action.payload)
-        }
     }
 })
-export const {addSankeyData} = sankeySlice.actions
-export default sankeySlice.reducer
+export const { useFetchSankeyDataQuery } = sankeySlice
